@@ -34,9 +34,9 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.MessageChannel;
 import org.springframework.integration.MessageHandlingException;
-import org.springframework.integration.core.SubscribableChannel;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
@@ -102,6 +102,7 @@ public class RestartJobIntegrationTests {
 				// JobParametersNotFoundException;
 			}
 
+			@Override
 			public void describeTo(Description description) {
 				description.appendText("exception has cause of JobParametersNotFoundException");
 			}

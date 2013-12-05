@@ -29,12 +29,12 @@ import org.springframework.batch.admin.integration.JobConfigurationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.integration.Message;
-import org.springframework.integration.MessageChannel;
-import org.springframework.integration.MessagingException;
-import org.springframework.integration.core.MessageHandler;
 import org.springframework.integration.core.MessagingTemplate;
-import org.springframework.integration.core.SubscribableChannel;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHandler;
+import org.springframework.messaging.MessagingException;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
@@ -55,13 +55,13 @@ public class JobConfigurationRequestIntegrationTests {
 
 	private List<String> result;
 
-	private MessageHandler handler = new MessageHandler() {	
+	private final MessageHandler handler = new MessageHandler() {
 		@SuppressWarnings("unchecked")
 		public void handleMessage(Message<?> message) throws MessagingException {
 			result = (List<String>) message.getPayload();
 		}
 	};
-	
+
 	@Before
 	public void init() {
 		replies.subscribe(handler);
@@ -78,14 +78,13 @@ public class JobConfigurationRequestIntegrationTests {
 
 		MessagingTemplate gateway = new MessagingTemplate();
 		gateway.setReceiveTimeout(500L);
-		gateway.afterPropertiesSet();
 
 		JobConfigurationRequest request = new JobConfigurationRequest();
 		request.setXml(IOUtils.toString(new ClassPathResource("/staging-context.xml").getInputStream()));
 		gateway.convertAndSend(requests, request);
 		assertNotNull("Time out waiting for reply", result);
  		assertEquals("[staging]", result.toString());
- 		
+
 	}
 
 }

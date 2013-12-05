@@ -17,12 +17,12 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
-import org.springframework.integration.Message;
-import org.springframework.integration.MessageDeliveryException;
 import org.springframework.integration.MessageHandlingException;
 import org.springframework.integration.MessageRejectedException;
-import org.springframework.integration.core.MessageHandler;
-import org.springframework.integration.core.SubscribableChannel;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageDeliveryException;
+import org.springframework.messaging.MessageHandler;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
@@ -32,19 +32,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class LocalFileServiceJobIntegrationTests {
-	
+
 	private static Log logger = LogFactory.getLog(LocalFileServiceJobIntegrationTests.class);
 
 	@Autowired
 	private LocalFileService service;
-	
+
 	@Autowired
 	private JobLauncher jobLauncher;
-	
+
 	@Autowired
 	@Qualifier("staging")
 	private Job job;
-	
+
 	private JobExecution jobExecution;
 
 	@Autowired
@@ -59,6 +59,7 @@ public class LocalFileServiceJobIntegrationTests {
 	@Test
 	public void testTrigger() throws Exception {
 		operator.subscribe(new MessageHandler() {
+			@Override
 			public void handleMessage(Message<?> message) throws MessageRejectedException, MessageHandlingException,
 					MessageDeliveryException {
 				logger.debug(""+message);
@@ -72,7 +73,7 @@ public class LocalFileServiceJobIntegrationTests {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		Thread.sleep(1000L);
 	}
-	
+
 	@Test
 	public void testResourceConverter() throws Exception {
 		FileInfo info = service.createFile("foo/crap");
