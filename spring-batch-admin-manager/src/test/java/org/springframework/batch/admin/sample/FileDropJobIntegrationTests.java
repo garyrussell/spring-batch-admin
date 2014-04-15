@@ -34,9 +34,9 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.Message;
-import org.springframework.integration.core.MessageHandler;
-import org.springframework.integration.core.SubscribableChannel;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHandler;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
@@ -51,9 +51,9 @@ public class FileDropJobIntegrationTests {
 	@Qualifier("job-operator")
 	private SubscribableChannel replies;
 
-	private BlockingQueue<JobExecution> receiver = new ArrayBlockingQueue<JobExecution>(1);
+	private final BlockingQueue<JobExecution> receiver = new ArrayBlockingQueue<JobExecution>(1);
 
-	private MessageHandler handler = new MessageHandler() {
+	private final MessageHandler handler = new MessageHandler() {
 		public void handleMessage(Message<?> message) {
 			receiver.add((JobExecution) message.getPayload());
 		}
@@ -63,14 +63,14 @@ public class FileDropJobIntegrationTests {
 	public void start() {
 		replies.subscribe(handler);
 	}
-	
+
 	@BeforeClass
 	@AfterClass
 	public static void deleteOldFiles() throws Exception {
 		FileUtils.deleteDirectory(new File("target/data"));
-		new File("target/data").mkdirs();	
+		new File("target/data").mkdirs();
 	}
-	
+
 	@After
 	public void cleanup() {
 		replies.unsubscribe(handler);
